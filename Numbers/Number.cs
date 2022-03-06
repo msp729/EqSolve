@@ -1,123 +1,120 @@
 namespace EqSolve.Numbers
 {
-    public struct Number<T> : INumber<T> where T : INumber<T>
+    public readonly struct Number<T> : INumber<Number<T>> where T : INumber<T>
     {
         public readonly T Value;
 
-        #region Initializers & Deinitializers
-        
-        public Number(T value)
-        {
-            Value = value;
-        }
 
-        public static implicit operator Number<T>(T value)
-        {
-            return new(value);
-        }
+        #region Convenience
 
         public static implicit operator T(Number<T> value)
         {
             return value.Value;
         }
 
+        public static implicit operator Number<T>(T value)
+        {
+            return new(value);
+        }
+        
+        public Number(T value)
+        {
+            Value = value;
+        }
+
         #endregion
 
-        #region Delegating to Value
+        #region Delegation
 
-        #region Comparison
-        #nullable enable
-
-        public int CompareTo(T? other)
+        public int CompareTo(Number<T> other)
         {
             return Value.CompareTo(other);
         }
 
-        public bool Equals(T? other)
+        public bool Equals(Number<T> other)
         {
             return Value.Equals(other);
         }
 
-        #nullable disable
-        #endregion
+        public Number<T> FromInt(int value)
+        {
+            return Value.FromInt(value);
+        }
 
-        #region Arithmetic
-
-        public T Add(T that)
+        public Number<T> Add(Number<T> that)
         {
             return Value.Add(that);
         }
 
-        public T Sub(T that)
+        public Number<T> Sub(Number<T> that)
         {
             return Value.Sub(that);
         }
 
-        public T Negate()
+        public Number<T> Negate()
         {
             return Value.Negate();
         }
 
-        public T Abs()
+        public Number<T> Abs()
         {
             return Value.Abs();
         }
 
-        #endregion
-
-        #region Geometric
-
-        public T Mul(T that)
+        public Number<T> Mul(Number<T> that)
         {
             return Value.Mul(that);
         }
 
-        public T Div(T that)
+        public Number<T> Div(Number<T> that)
         {
-            return Value.Div(that);
+            return Value.Mul(that);
         }
 
-        #endregion
-
-        #region Exponential
-
-        public T Pow(T that)
+        public Number<T> Pow(Number<T> that)
         {
             return Value.Pow(that);
         }
 
-        public T Exp()
+        public Number<T> Exp()
         {
             return Value.Exp();
         }
 
-        public T Expm1()
+        public Number<T> Expm1()
         {
             return Value.Expm1();
         }
 
-        public T Log(T that)
+        public Number<T> Log(Number<T> that)
         {
             return Value.Log(that);
         }
 
-        public T Log()
+        public Number<T> Log()
         {
             return Value.Log();
         }
 
-        public T Logp1()
+        public Number<T> Logp1()
         {
             return Value.Logp1();
         }
 
-        #endregion
+        public Number<T> Mod(Number<T> that)
+        {
+            return Value.Mod(that);
+        }
+
+        public Number<T> Gcd(Number<T> that)
+        {
+            return Value.Gcd(that);
+        }
 
         #endregion
 
         #region Operators
 
-        #region Unary
         public static Number<T> operator +(Number<T> value)
         {
             return value;
@@ -125,12 +122,8 @@ namespace EqSolve.Numbers
 
         public static Number<T> operator -(Number<T> value)
         {
-            return value.Negate(); // implicit casts are a developer's best friend.
+            return value.Negate();
         }
-
-        #endregion
-
-        #region Binary
 
         public static Number<T> operator +(Number<T> left, Number<T> right)
         {
@@ -152,7 +145,25 @@ namespace EqSolve.Numbers
             return left.Div(right);
         }
 
-        #endregion
+        public static bool operator ==(Number<T> left, Number<T> right)
+        {
+            return left.Equals(right);
+        }
+        
+        public static bool operator !=(Number<T> left, Number<T> right)
+        {
+            return !left.Equals(right);
+        }
+        
+        public static bool operator >(Number<T> left, Number<T> right)
+        {
+            return left.CompareTo(right) == 1;
+        }
+        
+        public static bool operator <(Number<T> left, Number<T> right)
+        {
+            return left.CompareTo(right) == -1;
+        }
 
         #endregion
     }

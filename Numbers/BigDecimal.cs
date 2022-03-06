@@ -45,6 +45,11 @@ namespace EqSolve.Numbers
             return new BigDecimal(value);
         }
 
+        public BigDecimal FromInt(int value)
+        {
+            return value;
+        }
+
         #endregion
 
         #region Operations
@@ -83,6 +88,28 @@ namespace EqSolve.Numbers
         public BigDecimal Abs()
         {
             return new(BigInteger.Abs(UnscaledValue), Scale);
+        }
+
+        public BigDecimal Mod(BigDecimal that)
+        {
+            int outScale = that.Scale > this.Scale ? that.Scale : this.Scale;
+            return new BigDecimal(
+                this.ScaledTo(outScale).UnscaledValue
+                % that.ScaledTo(outScale).UnscaledValue,
+                outScale
+            );
+        }
+
+        private static BigDecimal Gcd(BigDecimal a, BigDecimal b)
+        {
+            if (a < b) return Gcd(b, a);
+            if (b == 0) return a;
+            return Gcd(b, a.Mod(b));
+        }
+
+        public BigDecimal Gcd(BigDecimal that)
+        {
+            return Gcd(this, that);
         }
 
         #endregion

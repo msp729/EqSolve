@@ -33,6 +33,11 @@ namespace EqSolve.Numbers
             Denominator = denominator;
         }
 
+        public BigFraction FromInt(int value)
+        {
+            return value;
+        }
+
         #endregion
 
         #region Operations
@@ -70,6 +75,26 @@ namespace EqSolve.Numbers
         public BigFraction Sub(BigFraction that)
         {
             return Add(that.Negate());
+        }
+
+        public BigFraction Mod(BigFraction that)
+        {
+            return new BigFraction(
+                (this.Numerator * that.Denominator) % (that.Numerator * this.Denominator),
+                this.Denominator * that.Denominator
+            ).Normalize();
+        }
+
+        public BigFraction Gcd(BigFraction that)
+        {
+            return Gcd(this, that);
+        }
+
+        private static BigFraction Gcd(BigFraction a, BigFraction b)
+        {
+            if (a < b) return Gcd(b, a);
+            if (b.Equals(new BigFraction(0))) return a;
+            return Gcd(b, a.Mod(b));
         }
 
         #endregion

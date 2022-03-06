@@ -21,6 +21,11 @@ namespace EqSolve.Numbers
             return value.Value;
         }
 
+        public DoubleWrapper FromInt(int value)
+        {
+            return value; // me when the implicit cast
+        }
+
         public DoubleWrapper Negate()
         {
             return -(double) this; // interface provides a negation operator that relies on this method
@@ -80,6 +85,23 @@ namespace EqSolve.Numbers
         public DoubleWrapper Logp1()
         {
             return Log() + 1;
+        }
+
+        public DoubleWrapper Mod(DoubleWrapper that)
+        {
+            return Value % that;
+        }
+
+        public DoubleWrapper Gcd(DoubleWrapper that)
+        {
+            return Gcd(this, that);
+        }
+
+        private static double Gcd(double a, double b)
+        {
+            if (a < b) return Gcd(b, a);
+            if (b == 0) return b;
+            return Gcd(b, a % b);
         }
 
         public int CompareTo(DoubleWrapper other)
