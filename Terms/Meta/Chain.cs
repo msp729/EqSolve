@@ -10,6 +10,11 @@ namespace EqSolve.Terms.Standard
 
         public Chain(Term<N> outer, Term<N> inner)
         {
+            if (outer is Chain<N>)
+            {
+                Console.WriteLine("It is best practice to chain internally."); //TODO: get logging library (low priority)
+                Console.WriteLine("This means no Chain should have another Chain as its outer term.");
+            }
             Outer = outer;
             Inner = inner;
         }

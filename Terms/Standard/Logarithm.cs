@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using EqSolve.Numbers;
+using EqSolve.Terms.Meta;
 
 namespace EqSolve.Terms.Standard
 {
@@ -43,10 +45,24 @@ namespace EqSolve.Terms.Standard
         {
             if (!container.IsOn(this))
                 throw new IllegalStateException("CanSimplify() called on external term. This should never happen.");
-            switch (container.GetType().Name)
+            if (container is Chain<N> c)
             {
-                default: return false; // TODO: logarithm simplification logic
+                if (Equals(c.Outer) && (c.Inner is PowerLaw<N> || c.Inner is Exponential<N>)) return true;
+                if (Equals(c.Inner) && c.Outer is Exponential<N>) return true;
             }
+
+            if (container is Product<N> or Quotient<N>)
+            {
+                return false;
+            }
+
+            if (container is Sum<N> s)
+            {
+                var @base = Base;
+                return s.Terms.Count(t => t is Logarithm<N> l && l.Base == @base) >= 2;
+            }
+
+            return false;
         }
 
         Number<N> Term<N>.Coefficient()
