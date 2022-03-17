@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using EqSolve.Numbers;
+using EqSolve.Terms.Meta;
 
 namespace EqSolve.Terms.Standard
 {
@@ -43,9 +45,35 @@ namespace EqSolve.Terms.Standard
         {
             if (!container.IsOn(this))
                 throw new IllegalStateException("CanSimplify() called on external term. This should never happen.");
-            switch (container.GetType().Name)
+
+            switch (container)
             {
-                default: return false; // TODO: power law simplification logic
+                case Sum<N> s:
+                {
+                    var p = Power;
+                    return s.Terms.Count(t => t is PowerLaw<N> pl && pl.Power == p) >= 2;
+                }
+
+                case Product<N> p:
+                {
+                    return p.Terms.Count(t => t is PowerLaw<N>) >= 2;
+                }
+
+                case Quotient<N> q:
+                {
+                    return q.Numerator is PowerLaw<N> && q.Denominator is PowerLaw<N>;
+                }
+
+                case Chain<N> c:
+                {
+                    if (this.Equals(c.Outer))
+                        return c.Inner is PowerLaw<N>
+                            || c.Inner is Chain<N> c2 && c2.Outer is PowerLaw<N>; // a(cx^d)^b=a*c^b*x^(db)
+                    if (this.Equals(c.Inner))
+                        return c.Outer is Logarithm<N> or PowerLaw<N>; // lol
+                    return false;
+                }
+                default: return false;
             }
         }
 
