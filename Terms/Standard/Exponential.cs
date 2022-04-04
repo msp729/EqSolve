@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using EqSolve.Numbers;
+using EqSolve.Terms.Meta;
 
 namespace EqSolve.Terms.Standard
 {
@@ -66,9 +68,19 @@ namespace EqSolve.Terms.Standard
         {
             if (!container.IsOn(this))
                 throw new IllegalStateException("CanSimplify() called on external term. This should never happen.");
-            switch (container.GetType().Name)
+            switch (container)
             {
-                default: return false; // TODO: exponent simplification logic
+                case Product<N> p:
+                    return p.Terms.Count(t => t is Exponential<N>) > 1;
+                case Quotient<N> q:
+                    return q.Numerator is Exponential<N> && q.Denominator is Exponential<N>;
+                case Sum<N> s:
+                    var b = Base;
+                    return s.Terms.Count(t => t is Exponential<N> e && e.Base == b) > 1;
+                case Chain<N> c:
+                    if (c.Inner.Equals(this)) return c.Outer is PowerLaw<N> or Logarithm<N>;
+                    return c.Inner is Logarithm<N>;
+                default: return false; // TODO: probably add more exponent simplification logic
             }
         }
     }

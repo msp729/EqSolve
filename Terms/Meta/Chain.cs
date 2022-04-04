@@ -50,10 +50,10 @@ namespace EqSolve.Terms.Standard
         {
             if (!container.IsOn(this))
                 throw new IllegalStateException("CanSimplify() called on external term. This should never happen.");
-            switch (container.GetType().Name)
+            return container switch
             {
-                default: return false; // TODO: chain simplification logic
-            }
+                _ => false
+            };
         }
 
         public Term<N> Derivative()

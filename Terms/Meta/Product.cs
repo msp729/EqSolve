@@ -49,9 +49,12 @@ namespace EqSolve.Terms.Meta
         {
             if (!container.IsOn(this))
                 throw new IllegalStateException("CanSimplify() called on external term. This should never happen.");
-            switch (container.GetType().Name)
+            switch (container)
             {
-                default: return false; // TODO: product simplification logic
+                case Product<N> or Quotient<N>:
+                    return true;
+                default:
+                    return false; // TODO: i should probably add more logic for product simplification
             }
         }
 
