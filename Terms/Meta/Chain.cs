@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using EqSolve.Numbers;
 using EqSolve.Terms.Meta;
 
@@ -50,10 +51,10 @@ namespace EqSolve.Terms.Standard
         {
             if (!container.IsOn(this))
                 throw new IllegalStateException("CanSimplify() called on external term. This should never happen.");
-            return container switch
+            switch (container)
             {
-                _ => false
-            };
+                default: return false;
+            }
         }
 
         public Term<N> Derivative()
@@ -70,7 +71,24 @@ namespace EqSolve.Terms.Standard
 
         public bool IsOn(Term<N> that)
         {
-            return that == Inner || that == Outer;
+            return that.Equals(Inner) || that.Equals(Outer);
+        }
+
+        public bool CanBeSimplified()
+        {
+            return Inner.CanSimplify(this) || Outer.CanSimplify(this);
+        }
+
+        public ComplexTerm<N> Simplified()
+        {
+            if (Inner.CanSimplify(this)) return Inner.Simplified(this);
+            if (Outer.CanSimplify(this)) return Outer.Simplified(this);
+            return this;
+        }
+
+        public ComplexTerm<N> Simplified(ComplexTerm<N> container)
+        {
+            throw new IllegalStateException("Simplified(ComplexTerm<N>) called on a Complex Term which does not support it. This should never happen.");
         }
     }
 }

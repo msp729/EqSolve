@@ -15,6 +15,8 @@ namespace EqSolve.Terms
 
         public bool CanSimplify(ComplexTerm<N> container);
 
+        public ComplexTerm<N> Simplified(ComplexTerm<N> container);
+        
         public Term<N> Derivative();
         public Func<Number<N>, Number<N>> Function();
     }

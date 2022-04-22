@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using EqSolve.Numbers;
-using EqSolve;
 
 namespace EqSolve.Terms.Meta
 {
@@ -29,13 +28,32 @@ namespace EqSolve.Terms.Meta
         {
             if (!container.IsOn(this))
                 throw new IllegalStateException("CanSimplify() called on external term. This should never happen.");
-            switch (container)
+            return container switch
             {
-                case Sum<N>:
-                    return true; // lol
-                default:
-                    return false; // TODO: i should probably add more logic for sum simplification
-            }
+                Sum<N> => true,
+                _ => false
+            };
+        }
+        
+        public ComplexTerm<N> Simplified(ComplexTerm<N> container)
+        {
+            if (!container.IsOn(this)) return container;
+            if (container is Sum<N> s) return new Sum<N>(Terms.Concat(s.Terms).ToArray());
+            return container;
+        }
+
+        public bool CanBeSimplified()
+        {
+            var @this = this;
+            return Terms.Any(t => t.CanSimplify(@this));
+        }
+
+        public ComplexTerm<N> Simplified()
+        {
+            var @this = this;
+            return Terms.Any(t => t.CanSimplify(@this))
+                ? Terms.First(t => t.CanSimplify(@this)).Simplified(this)
+                : this;
         }
 
         public Term<N> Derivative()
@@ -45,10 +63,10 @@ namespace EqSolve.Terms.Meta
 
         public Func<Number<N>, Number<N>> Function()
         {
-            Term<N>[] terms = Terms;
+            var terms = Terms;
             return number => terms.Select(t => t.Function()) // just hope terms aren't too deeply nested
-                .Select(f => f(number)) // wacky
-                .Aggregate((a, b) => a + b); // sigma wackiness
+                .Select(f => f(number))
+                .Aggregate((a, b) => a + b); // no sum function unless i cast to a primitive (i will not be doing that)
         }
 
         public bool IsOn(Term<N> that)

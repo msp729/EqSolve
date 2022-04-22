@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using EqSolve.Numbers;
 using EqSolve.Terms.Standard;
 
@@ -31,11 +33,47 @@ namespace EqSolve.Terms.Meta
                 throw new IllegalStateException("CanSimplify() called on external term. This should never happen.");
             switch (container)
             {
-                case Product<N> or Quotient<N>:
+                case Product<N> p:
+                    return p.Terms.Count(t => t is Quotient<N>) > 1;
+                case Quotient<N>:
                     return true;
                 default:
                     return false; // TODO: i should probably add more logic for quotient simplification
             }
+        }
+
+        public ComplexTerm<N> Simplified(ComplexTerm<N> container)
+        {
+            if (!container.IsOn(this))
+                throw new IllegalStateException("Simplified() called on external term. This should never happen.");
+            switch (container)
+            {
+                case Quotient<N> q:
+                    return Utilities.SimplifyQuotient(q);
+                case Product<N> p:
+                    return new Quotient<N>(
+                        new Product<N>(p.Terms.Select(t => t is Quotient<N> q ? q.Numerator : t).ToArray()),
+                        new Product<N>(p.Terms.Where(t => t is Quotient<N>).Cast<Quotient<N>>()
+                            .Select(t => t.Denominator).ToArray())
+                    );
+                default:
+                    return container;
+            }
+        }
+
+        public bool CanBeSimplified()
+        {
+            return Numerator.CanSimplify(this) || Denominator.CanSimplify(this);
+        }
+
+        public ComplexTerm<N> Simplified()
+        {
+            return (Numerator.CanSimplify(this), Denominator.CanSimplify(this)) switch
+            {
+                (true, _) => Numerator.Simplified(this),
+                (_, true) => Denominator.Simplified(this),
+                _ => this
+            };
         }
 
         public Term<N> Derivative()
