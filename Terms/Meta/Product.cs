@@ -74,7 +74,7 @@ namespace EqSolve.Terms.Meta
 
         /// <summary>It simplifies the container.</summary>
         /// <remarks>This is an especially long and complicated function, one which should probably be split into multiple functions. </remarks>
-        public ComplexTerm<N> Simplified(ComplexTerm<N> container)
+        public Term<N> Simplified(ComplexTerm<N> container)
         {
             if (!container.IsOn(this))
                 throw new IllegalStateException("Simplified(ComplexTerm) called on external term. This should never happen.");
@@ -168,7 +168,7 @@ namespace EqSolve.Terms.Meta
             }
         }
 
-        public ComplexTerm<N> Simplified()
+        public Term<N> Simplified()
         {
             var @this = this;
             return Terms.Any(t => t.CanSimplify(@this)) ? Terms.First(t => t.CanSimplify(@this)).Simplified(@this) : @this;

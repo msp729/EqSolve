@@ -87,7 +87,7 @@ namespace EqSolve.Numbers
 
         public BigDecimal Abs()
         {
-            return new(BigInteger.Abs(UnscaledValue), Scale);
+            return new BigDecimal(BigInteger.Abs(UnscaledValue), Scale);
         }
 
         public BigDecimal Mod(BigDecimal that)
@@ -193,12 +193,14 @@ namespace EqSolve.Numbers
         {
             // ln 2 ~= 277/400 ~= 7/10
             // ln 10 ~= 921/400 ~= 7/3
-            // 277 and 921. anagrams. weird.
+            // it's weird that they share the 400 and the 7
+            // the 7 comes from 10 ^ 3, 2 ^ 10, and e ^ 7 all being close together
+            // no clue about the 400s though
             BigDecimal unscaledLog = UnscaledValue.GetBitLength();
-            unscaledLog = unscaledLog.Mul(410).Div(291);
+            unscaledLog = unscaledLog.Mul(402).Div(291);
             BigDecimal scaleLog = Scale;
-            scaleLog = scaleLog.Mul(410).Div(921);
-            return unscaledLog.Add(scaleLog); // note that the actual value would be closer to 400, but 420 is funnier
+            scaleLog = scaleLog.Mul(402).Div(921);
+            return unscaledLog.Add(scaleLog);
             // also Newton's method works much better with overestimates
         }
 
@@ -206,37 +208,25 @@ namespace EqSolve.Numbers
         {
             BigDecimal n = this;
             BigDecimal x = LnApprox().Add(1); // computationally inexpensive, uses simple approximations of ln(10) and of ln(2)
-            Func<BigDecimal, BigDecimal> f = @decimal => @decimal.Exp().Sub(n);
-            Func<BigDecimal, BigDecimal> deriv = @decimal => @decimal.Exp();
-            Func<BigDecimal, BigDecimal> change = @decimal => f(@decimal).Div(deriv(@decimal));
+            BigDecimal Func(BigDecimal @decimal) => @decimal.Exp().Sub(n);
+            BigDecimal Derivative(BigDecimal @decimal) => @decimal.Exp();
+
+            BigDecimal Change(BigDecimal @decimal) => Func(@decimal).Div(Derivative(@decimal));
             // newton's method setup: establish f and f', get x0.
             // then, calculate.
-            for (int i = 0; i < expPrecisionBase + UnscaledValue.GetBitLength() + Math.Abs(Scale); i++)
+            for (var i = 0; i < expPrecisionBase + UnscaledValue.GetBitLength() + Math.Abs(Scale); i++)
             {
-                x = x.Sub(change(x)); // it shouldn't be necessary to iterate too much.
+                x = x.Sub(Change(x)); // it shouldn't be necessary to iterate too much.
                 // iterating further w/ larger scale & bit length compensates for how shitty LnApprox is.
             }
-            // halley's method could be used here. that said, i prefer newton's method.
+            // halley's method could be used here. that said, i think newton's is typically less expensive computationally?
 
             return x;
         }
 
         public BigDecimal Logp1()
         {
-            BigDecimal n = this;
-            BigDecimal x = LnApprox(); // computationally inexpensive, uses simple approximations of ln(10) and of ln(2)
-            Func<BigDecimal, BigDecimal> f = @decimal => @decimal.Sub(1).Exp().Sub(n);
-            Func<BigDecimal, BigDecimal> deriv = @decimal => @decimal.Sub(1).Exp();
-            Func<BigDecimal, BigDecimal> change = @decimal => f(@decimal).Div(deriv(@decimal));
-            // newton's method setup: establish f and f', get x0.
-            // then, calculate.
-            for (int i = 0; i < expPrecisionBase + UnscaledValue.GetBitLength() + Math.Abs(Scale); i++)
-            {
-                x = x.Sub(change(x)); // it shouldn't be necessary to iterate too much.
-                // iterating further w/ larger scale & bit length compensates for how shitty LnApprox is.
-            }
-
-            return x;
+            return Add(1).Log();
         }
 
         public BigDecimal Log(BigDecimal @base)

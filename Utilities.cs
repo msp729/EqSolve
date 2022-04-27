@@ -14,7 +14,7 @@ namespace EqSolve
             switch (a, a.IsConstant(), b, b.IsConstant())
             {
                 case (_, true, _, true):
-                    return new PowerLaw<N>(a.Constant() * b.Constant(), a.Constant().FromInt(0)); // if this breaks it's someone else's fault
+                    return new ConstantValue<N>(a.Constant() * b.Constant()); // if this breaks it's someone else's fault
                 case (_, true, _, false):
                     return b.Multiply(a.Constant());
                 case (_, false, _, true):

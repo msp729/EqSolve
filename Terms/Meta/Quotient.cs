@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using EqSolve.Numbers;
 using EqSolve.Terms.Standard;
 
@@ -42,7 +41,7 @@ namespace EqSolve.Terms.Meta
             }
         }
 
-        public ComplexTerm<N> Simplified(ComplexTerm<N> container)
+        public Term<N> Simplified(ComplexTerm<N> container)
         {
             if (!container.IsOn(this))
                 throw new IllegalStateException("Simplified() called on external term. This should never happen.");
@@ -66,7 +65,7 @@ namespace EqSolve.Terms.Meta
             return Numerator.CanSimplify(this) || Denominator.CanSimplify(this);
         }
 
-        public ComplexTerm<N> Simplified()
+        public Term<N> Simplified()
         {
             return (Numerator.CanSimplify(this), Denominator.CanSimplify(this)) switch
             {

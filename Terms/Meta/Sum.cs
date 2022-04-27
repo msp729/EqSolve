@@ -35,7 +35,7 @@ namespace EqSolve.Terms.Meta
             };
         }
         
-        public ComplexTerm<N> Simplified(ComplexTerm<N> container)
+        public Term<N> Simplified(ComplexTerm<N> container)
         {
             if (!container.IsOn(this)) return container;
             if (container is Sum<N> s) return new Sum<N>(Terms.Concat(s.Terms).ToArray());
@@ -48,7 +48,7 @@ namespace EqSolve.Terms.Meta
             return Terms.Any(t => t.CanSimplify(@this));
         }
 
-        public ComplexTerm<N> Simplified()
+        public Term<N> Simplified()
         {
             var @this = this;
             return Terms.Any(t => t.CanSimplify(@this))

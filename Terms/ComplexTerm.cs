@@ -6,6 +6,6 @@ namespace EqSolve.Terms
     {
         public bool IsOn(Term<N> that);
         public bool CanBeSimplified();
-        public ComplexTerm<N> Simplified();
+        public Term<N> Simplified();
     }
 }

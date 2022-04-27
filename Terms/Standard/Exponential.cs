@@ -78,9 +78,30 @@ namespace EqSolve.Terms.Standard
                     var b = Base;
                     return s.Terms.Count(t => t is Exponential<N> e && e.Base == b) > 1;
                 case Chain<N> c:
-                    if (c.Inner.Equals(this)) return c.Outer is PowerLaw<N> or Logarithm<N>;
+                    if (c.Inner.Equals(this)) return c.Outer is Logarithm<N>;
                     return c.Inner is Logarithm<N>;
                 default: return false; // TODO: probably add more exponent simplification logic
+            }
+        }
+        
+        public Term<N> Simplified(ComplexTerm<N> container)
+        {
+            switch (container)
+            {
+                case Product<N> {Terms: { } terms}:
+                    var exponents = terms.Where(t => t is Exponential<N>).Cast<Exponential<N>>()
+                        .Select(e => e.Base).Aggregate((a, b) => a * b);
+                    var baseTerms = terms.Where(t => t is not Exponential<N>);
+                    if (baseTerms.Any())
+                        return new Product<N>(baseTerms.Append(new Exponential<N>(exponents, Base.FromInt(1))).ToArray());
+                    return new Exponential<N>(exponents, Base.FromInt(1));
+                case Quotient<N> {Numerator: Exponential<N> {Base: { } b1, Coefficient: { } c1},
+                    Denominator: Exponential<N> {Base: { } b2, Coefficient: { } c2}}:
+                    return new Exponential<N>(b1 / b2, c1 / c2);
+                case Chain<N> c:
+                    return Logarithm<N>.SimplifyChain(c);
+                default:
+                    return container;
             }
         }
     }

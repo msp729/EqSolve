@@ -79,14 +79,14 @@ namespace EqSolve.Terms.Standard
             return Inner.CanSimplify(this) || Outer.CanSimplify(this);
         }
 
-        public ComplexTerm<N> Simplified()
+        public Term<N> Simplified()
         {
-            if (Inner.CanSimplify(this)) return Inner.Simplified(this);
-            if (Outer.CanSimplify(this)) return Outer.Simplified(this);
-            return this;
+            return Inner.CanSimplify(this) ? Inner.Simplified(this)
+                : Outer.CanSimplify(this) ? Outer.Simplified(this)
+                : this;
         }
 
-        public ComplexTerm<N> Simplified(ComplexTerm<N> container)
+        public Term<N> Simplified(ComplexTerm<N> container)
         {
             throw new IllegalStateException("Simplified(ComplexTerm<N>) called on a Complex Term which does not support it. This should never happen.");
         }
