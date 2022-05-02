@@ -1,8 +1,8 @@
 # EqSolve Roadmap
 
-### Immediately, it just needs to build.
-- This means making the Standard Terms implement the Term interface.
-- This also meant making some small changes to function signatures.
+## UI changes
+- [ ] It needs to have one
+  - Work on a FunctionParser class, to interpret user-inputted functions.
 
 ## Term capabilities
 

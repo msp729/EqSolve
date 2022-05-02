@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Numerics;
 
 namespace EqSolve.Numbers
@@ -330,15 +331,16 @@ namespace EqSolve.Numbers
 
         #region Stringification
 
-        public new string ToString()
+        public override string ToString()
         {
             BigDecimal normalized = Normalize();
             BigInteger poweredScale = BigInteger.Pow(Ten, -normalized.Scale);
             return Scale switch
             {
-                0 => normalized.UnscaledValue.ToString(),
-                > 0 => normalized.UnscaledValue.ToString() + '0' * Scale,
-                < 0 => normalized.UnscaledValue / poweredScale + "." + normalized.UnscaledValue % poweredScale
+                0 => normalized.UnscaledValue.ToString(CultureInfo.CurrentCulture),
+                > 0 => normalized.UnscaledValue.ToString(CultureInfo.CurrentCulture) + '0' * Scale,
+                < 0 => (normalized.UnscaledValue / poweredScale).ToString(CultureInfo.CurrentCulture)
+                       + "." + (normalized.UnscaledValue % poweredScale).ToString(CultureInfo.CurrentCulture)
             };
         }
 

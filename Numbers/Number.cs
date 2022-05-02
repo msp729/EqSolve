@@ -4,6 +4,10 @@ namespace EqSolve.Numbers
     {
         public readonly T Value;
 
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
 
         #region Convenience
 
@@ -68,7 +72,7 @@ namespace EqSolve.Numbers
 
         public Number<T> Div(Number<T> that)
         {
-            return Value.Mul(that);
+            return Value.Div(that);
         }
 
         public Number<T> Pow(Number<T> that)

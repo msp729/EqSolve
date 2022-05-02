@@ -1,10 +1,16 @@
 using System;
+using System.Globalization;
 
 namespace EqSolve.Numbers
 {
     public readonly struct DoubleWrapper :INumber<DoubleWrapper>
     {
         public double Value { get; }
+
+        public override string ToString()
+        {
+            return Value.ToString(CultureInfo.CurrentCulture);
+        }
 
         public DoubleWrapper(double value)
         {

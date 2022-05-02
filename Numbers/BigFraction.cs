@@ -244,5 +244,10 @@ namespace EqSolve.Numbers
         #endregion
 
         #endregion
+
+        public override string ToString()
+        {
+            return $"{Numerator}/{Denominator}";
+        }
     }
 }
