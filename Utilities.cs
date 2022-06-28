@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using EqSolve.Numbers;
 using EqSolve.Terms;
 using EqSolve.Terms.Meta;
@@ -11,23 +10,18 @@ namespace EqSolve
     {
         public static Term<N> SimpleMultiply<N>(Term<N> a, Term<N> b) where N : INumber<N>
         {
-            switch (a, a.IsConstant(), b, b.IsConstant())
+            return (a, a.IsConstant(), b, b.IsConstant()) switch
             {
-                case (_, true, _, true):
-                    return new ConstantValue<N>(a.Constant() * b.Constant()); // if this breaks it's someone else's fault
-                case (_, true, _, false):
-                    return b.Multiply(a.Constant());
-                case (_, false, _, true):
-                    return a.Multiply(b.Constant());
-                case (Product<N> p1, _, Product<N> p2, _):
-                    return new Product<N>(p1.Terms.Concat(p2.Terms).ToArray());
-                case (Product<N> p, _, _, _):
-                    return new Product<N>(p.Terms.Concat(new[] { b }).ToArray());
-                case (_, _, Product<N> p, _):
-                    return new Product<N>(p.Terms.Concat(new[] { a }).ToArray());
-                default:
-                    return new Product<N>(a, b);
-            }
+                (_, true, _, true) =>
+                    new ConstantValue<N>(a.Constant() * b.Constant()) // if this breaks it's someone else's fault
+                ,
+                (_, true, _, false) => b.Multiply(a.Constant()),
+                (_, false, _, true) => a.Multiply(b.Constant()),
+                (Product<N> p1, _, Product<N> p2, _) => new Product<N>(p1.Terms.Concat(p2.Terms).ToArray()),
+                (Product<N> p, _, _, _) => new Product<N>(p.Terms.Concat(new[] {b}).ToArray()),
+                (_, _, Product<N> p, _) => new Product<N>(p.Terms.Concat(new[] {a}).ToArray()),
+                _ => new Product<N>(a, b)
+            };
         }
 
         public static Quotient<N> SimplifyQuotient<N>(Quotient<N> quotient) where N : INumber<N>

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Numerics;
 
 namespace EqSolve.Numbers
@@ -20,6 +21,21 @@ namespace EqSolve.Numbers
         public static implicit operator BigFraction(BigInteger value)
         {
             return new(value);
+        }
+
+        public BigFraction(string value)
+        {
+            switch (value.Count('.'.Equals))
+            {
+                case > 1: throw new ArgumentException("Too many decimal points in the string.");
+                case 0: Numerator = BigInteger.Parse(value); Denominator = 1; break;
+                case 1:
+                    var split = value.Split('.');
+                    Numerator = BigInteger.Parse(split[0] + split[1]);
+                    Denominator = BigInteger.Pow(10, split[1].Length);
+                    break;
+                default: Numerator = Denominator = 1; break;
+            }
         }
 
         public static implicit operator BigFraction(long value)

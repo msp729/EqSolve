@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using EqSolve.Numbers;
 using EqSolve.Terms.Meta;
@@ -50,27 +49,27 @@ namespace EqSolve.Terms.Standard
             switch (container)
             {
                 case Sum<N> s:
-                {
-                    var p = Power;
-                    return s.Terms.Count(t => t is PowerLaw<N> pl && pl.Power == p) >= 2;
-                }
+                    {
+                        var p = Power;
+                        return s.Terms.Count(t => t is PowerLaw<N> pl && pl.Power == p) >= 2;
+                    }
 
                 case Product<N> p:
-                {
-                    return p.Terms.Count(t => t is PowerLaw<N>) >= 2;
-                }
+                    {
+                        return p.Terms.Count(t => t is PowerLaw<N>) >= 2;
+                    }
 
                 case Quotient<N> { Numerator: PowerLaw<N>, Denominator: PowerLaw<N> }:
                     return true;
 
                 case Chain<N> c:
-                {
-                    if (Equals(c.Outer))
-                        return c.Inner is PowerLaw<N> or Chain<N> {Outer: PowerLaw<N>}; // a(cx^d)^b=a*c^b*x^(db)
-                    if (Equals(c.Inner))
-                        return c.Outer is Logarithm<N> or PowerLaw<N>; // lol
-                    return false;
-                }
+                    {
+                        if (Equals(c.Outer))
+                            return c.Inner is PowerLaw<N> or Chain<N> { Outer: PowerLaw<N> }; // a(cx^d)^b=a*c^b*x^(db)
+                        if (Equals(c.Inner))
+                            return c.Outer is Logarithm<N> or PowerLaw<N>; // lol
+                        return false;
+                    }
                 default: return false;
             }
         }
@@ -108,11 +107,11 @@ namespace EqSolve.Terms.Standard
         {
             var inner = chain.Inner;
             Term<N> @internal = null;
-            if (inner is Chain<N> {Outer: { } o, Inner: { } i }) (inner, @internal) = (o, i); // un-nest internal chains
+            if (inner is Chain<N> { Outer: { } o, Inner: { } i }) (inner, @internal) = (o, i); // un-nest internal chains
             Term<N> @out;
             switch (inner, chain.Outer)
             {
-                case (PowerLaw<N> {Coefficient: var c1, Power: var p1}, PowerLaw<N> {Coefficient: var c2, Power: var p2}
+                case (PowerLaw<N> { Coefficient: var c1, Power: var p1 }, PowerLaw<N> { Coefficient: var c2, Power: var p2 }
                     ):
                     @out = new PowerLaw<N>(c1.Pow(p2) * c2, p1 * p2);
                     break;

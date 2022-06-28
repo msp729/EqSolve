@@ -11,4 +11,14 @@ namespace EqSolve.Terms
             Cause = cause;
         }
     }
+
+    public class InterpreterError : ApplicationException
+    {
+        public readonly string Cause;
+
+        public InterpreterError(string cause)
+        {
+            Cause = cause;
+        }
+    }
 }
